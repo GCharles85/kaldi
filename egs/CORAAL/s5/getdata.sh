@@ -7,6 +7,7 @@
 
 file=$1
 
+echo "Retrieving files from the online DB..."
 while read line; do
 	wget $line
 done 
@@ -14,11 +15,13 @@ done
 #process the transcription file and create text file (utt transc) and segments file(utt utt segstart segendr)
 
 #untar the tarball metafile
+echo "Extracting audio files..."
 $metatar =  $(find . -type f -name "*meta*.tar.gz") 
 tar -zxvf $metatar 
 rm $metatar
 
 #untar the audio files and extract their utterances
+echo "Segmenting audio files..."
 filename=' '
 for $file in *.tar.gz; do
 
@@ -33,15 +36,15 @@ for $file in *.tar.gz; do
 done
 
 #to gen: look for a folder with audio in name or pass in audio folder via array as the last element
-audio=$(ls -d *audio)
-mv *sub*.wav $audio
+echo "Moving segments to audio folder..."
+mv *sub*.wav audio
 
 
-cd $audio
+cd audio
 
 #randomly select 80% of the audio files to go to the training folder and 20% to go into the test folder
 #get count of num of audio files, get 80% of them
-
+echo "Selecting trainning and testing files via 80/20 split"
 count=$(ls | wc -l)
 count=$count*.80
 
@@ -53,5 +56,6 @@ cd ..
 
 #to gen: append audio folder name to train arr but we dont need to if it looks for it in next script
 #call the prepare script
-./prepare_test_train.sh ${train_arr[*]}
+echo "Calling run.sh"
+./run.sh ${train_arr[*]}
 
