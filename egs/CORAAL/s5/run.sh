@@ -93,7 +93,7 @@ for x in $wav; do
 done
 
 echo "Creating spk2utt and MFCC features"
-mfccdir=${DATA_ROOT}/mfcc
+mfccdir=${DATA_R}/mfcc
 for x in test train; do
 	./utils/utt2spk_to_spk2utt.pl data/$x/utt2spk > data/$x/spk2utt
 	./steps/make_mfcc.sh --nj 20 --cmd "$test_cmd" data/$x exp/make_mfcc/$x $mfccdir
