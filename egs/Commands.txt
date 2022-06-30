@@ -1,0 +1,14 @@
+To create a container: docker run -v c:/Users/Gchar/Documents/github/kaldi/egs:/opt/local/kaldi_workspace/kaldi/egs -it monicadelaine1/kaldi_workspace:cleaner /bin/bash
+
+To create a copy container: docker exec -it contID /bin/bash
+
+To get pip and wavfile:
+apt-get update
+apt-get install python3-pip
+pip3 install wavfile
+
+To commit:
+git status 
+git add <file1> <file2> ...
+git status
+git -m commit 

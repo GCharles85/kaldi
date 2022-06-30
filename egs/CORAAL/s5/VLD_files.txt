@@ -1,0 +1,5 @@
+http://lingtools.uoregon.edu/coraal/vld/2021.07/VLD_audio_part01_2021.07.tar.gz
+http://lingtools.uoregon.edu/coraal/vld/2021.07/VLD_audio_part02_2021.07.tar.gz
+http://lingtools.uoregon.edu/coraal/vld/2021.07/VLD_audio_part03_2021.07.tar.gz
+http://lingtools.uoregon.edu/coraal/vld/2021.07/VLD_audio_part04_2021.07.tar.gz
+http://lingtools.uoregon.edu/coraal/vld/2021.07/VLD_textfiles_2021.07.tar.gz

@@ -1,61 +1,67 @@
 #!/usr/bin/bash
 #Guyriano Charles, June 2022
 
-#This file downloads CORAAL VLD data and moves it to the VLD_audio directory. It then selects 80% of the files as training data and the rest as test data. The names of the traning data files are sent to VLD_prepare_wav.sh when it is called which places the data into the appropriate folders. It also creates spk2genger, utt2spk, and wav.scp files in both the test and train folders.
+#This file downloads CORAAL VLD data and moves it to the VLD_audio directory. It then selects 80% of the files as training data and the rest as test data. The names of the training data files are sent to VLD_prepare_wav.sh when it is called which places the data into the appropriate folders. It also creates spk2genger, utt2spk, and wav.scp files in both the test and train folders.
 
-#to generalize: pass in links(for audio data and the transcrs) as txt file and get using for loop and the test and train folders
+#Pass in links(for audio data and the transcriptions) as txt file 
 
-file=$1
+source path.sh
+source cmd.sh
 
 echo "Retrieving files from the online DB..."
-while read line; do
-	wget $line
-done 
+wget -i $1 
 
-#process the transcription file and create text file (utt transc) and segments file(utt utt segstart segendr)
+#untar the tarball textfile
+echo "Extracting textfiles..."
+text_tar=$(find . -type f -name "*textfile*.tar.gz") 
+tar -zxvf $text_tar && rm $text_tar
 
-#untar the tarball metafile
-echo "Extracting audio files..."
-$metatar =  $(find . -type f -name "*meta*.tar.gz") 
-tar -zxvf $metatar 
-rm $metatar
+#untar the audio files
 
-#untar the audio files and extract their utterances
-echo "Segmenting audio files..."
-filename=' '
-for $file in *.tar.gz; do
+tar_gz=$(find . -type f -name "*.tar.gz")
+for file in $tar_gz; do
 
 	[ -f "$file" ] || break
-	tar -zxvf $file | $filename
-	$meta = $(find . type f -name "$filename.txt") #Grab the appropriate tar file for that interview audio
-	
-	#also pass the times from the given meta file; $1 is the line number to index to in prepare.sh, $3 is start_time, $5 is end_time
-	#move metafile to to train and test
- 	./parse_wav.py $filename $(awk '$1 -ne 'Line' && $2 -ne *"int"* && $4 -ne [()<>[]] { print $1, $3, $5 }' $meta) 
+	tar -zxvf $file 
+	rm $file
 
 done
 
-#to gen: look for a folder with audio in name or pass in audio folder via array as the last element
+wavs=$(find . -type f -name "*.wav")
+
+nonnecfiles=$(find . -type f -name "._*") #Grab the appropriate misc. tar file for that interview audio and remove it.
+rm -r $nonnecfiles
+texts=$(find . -maxdepth 1 -type f -name "*.txt")
+
+echo "Segmenting audio files..."
+
+
+for text wav in texts wavs; do
+	$(sed -i "1d" $text) #remove the column names from the text and only leave the actual data
+	$(awk '$2 !~ /'int'/ && $4 !~ //[(<[]/ { print NR, $3, $NF }' $text > awk_out.txt) #extract all lines from the text files that are not the interviewer and that do not contain action descriptors such as (pause)
+	python3 parse_wav.py $wav "awk_out.txt" #segment the lines from above out of the interview wav file
+        cp $text data/train #move the text file to both the train and test folders
+        mv $text data/test
+done
+
 echo "Moving segments to audio folder..."
-mv *sub*.wav audio
+mv *sub*.wav audio #the segments have a descriptor "sub" in their filename, moves these to the audio folder.
 
 
 cd audio
 
 #randomly select 80% of the audio files to go to the training folder and 20% to go into the test folder
 #get count of num of audio files, get 80% of them
-echo "Selecting trainning and testing files via 80/20 split"
+echo "Selecting training and testing files via 80/20 split"
 count=$(ls | wc -l)
-count=$count*.80
+count="$(($count*4/5))"
 
-count=$(echo $count | awk '{printf "%d\n", $1}')
 
 train_files=$(ls . | shuf -n $count)
-declare -a train_arr=($train_files)
-cd ..
+declare -a train_arr=($train_files) #the array train_arr contains utterance wav files to be moved into the train folder.
 
-#to gen: append audio folder name to train arr but we dont need to if it looks for it in next script
 #call the prepare script
 echo "Calling run.sh"
+cd ..
 ./run.sh ${train_arr[*]}
 
