@@ -91,4 +91,5 @@ venv/
 /src/**/CMakeLists.txt
 /build*
 
+# wav audio files
 *.wav
