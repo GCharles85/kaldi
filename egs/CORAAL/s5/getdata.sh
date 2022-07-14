@@ -8,44 +8,54 @@
 source path.sh
 source cmd.sh
 
+for x in train test; do
+	mkdir -p data/$x
+done
+
+if [ "$1" == *.txt]; then
+	echo "File containing links to data must not be text file" && exit 1
+fi
+
 echo "Retrieving files from the online DB..."
-wget -i $1 
+#wget -i $1 
 
 #untar the tarball textfile
-echo "Extracting textfiles..."
-text_tar=$(find . -type f -name "*textfile*.tar.gz") 
-tar -zxvf $text_tar && rm $text_tar
+#echo "Extracting textfiles..."
+#text_tar=$(find . -type f -name "*textfile*.tar.gz") 
+#tar -zxvf $text_tar && rm $text_tar
 
 #untar the audio files
 
-tar_gz=$(find . -type f -name "*.tar.gz")
-for file in $tar_gz; do
+#tar_gz=$(find . -type f -name "*.tar.gz")
+#for file in $tar_gz; do
 
-	[ -f "$file" ] || break
-	tar -zxvf $file 
-	rm $file
+#	[ -f "$file" ] || break
+#	tar -zxvf $file 
+#	rm $file
 
-done
-
-wavs=$(find . -type f -name "*.wav")
-
-nonnecfiles=$(find . -type f -name "._*") #Grab the appropriate misc. tar file for that interview audio and remove it.
-rm -r $nonnecfiles
-texts=$(find . -maxdepth 1 -type f -name "*.txt")
+#done
+ 
+#nonnecfiles=$(find . -type f -name "._*") #Grab the appropriate misc. tar file for that interview audio and remove it.
+#rm -r $nonnecfiles
 
 echo "Segmenting audio files..."
 
+#no="/[(<"
 
-for text wav in texts wavs; do
-	$(sed -i "1d" $text) #remove the column names from the text and only leave the actual data
-	$(awk '$2 !~ /'int'/ && $4 !~ //[(<[]/ { print NR, $3, $NF }' $text > awk_out.txt) #extract all lines from the text files that are not the interviewer and that do not contain action descriptors such as (pause)
-	python3 parse_wav.py $wav "awk_out.txt" #segment the lines from above out of the interview wav file
-        cp $text data/train #move the text file to both the train and test folders
-        mv $text data/test
-done
+#for text in *.txt; do
 
-echo "Moving segments to audio folder..."
-mv *sub*.wav audio #the segments have a descriptor "sub" in their filename, moves these to the audio folder.
+#	$(sed -i "1d" $text) #remove the column names from the text and only leave the actual data
+#	$(awk -v "nope=$no" '$2 !~ /'int'/ && $4 !~ /$no/ { print NR, $3, $NF }' $text > awk_out.txt) #extract all lines from the text files that are not the interviewer and that do not contain action descriptors such as (pause)
+#	for i in *.wav; do
+#		if [[ ${i##*.}==${text##*.} ]]; then
+#			python3 parse_wav.py "$i" "awk_out.txt" #segment the lines from above out of the interview wav file
+#			mv *sub*.wav audio #the segments have a descriptor "sub" in their filename, moves these to the audio folder.
+#		fi
+#	done
+
+#	cp $text data/train #move the text file to both the train and test folders
+ #       mv $text data/test
+#done
 
 
 cd audio
@@ -53,11 +63,11 @@ cd audio
 #randomly select 80% of the audio files to go to the training folder and 20% to go into the test folder
 #get count of num of audio files, get 80% of them
 echo "Selecting training and testing files via 80/20 split"
-count=$(ls | wc -l)
+count=$(ls *.wav | wc -l)
 count="$(($count*4/5))"
 
 
-train_files=$(ls . | shuf -n $count)
+train_files=$(ls *.wav | shuf -n $count)
 declare -a train_arr=($train_files) #the array train_arr contains utterance wav files to be moved into the train folder.
 
 #call the prepare script
