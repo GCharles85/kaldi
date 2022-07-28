@@ -12,7 +12,7 @@ for x in train test; do
 	mkdir -p data/$x
 done
 
-if [ "$1" == *.txt]; then
+if [ "$1" == *.txt ]; then
 	echo "File containing links to data must not be text file" && exit 1
 fi
 
@@ -40,22 +40,23 @@ echo "Retrieving files from the online DB..."
 
 echo "Segmenting audio files..."
 
-#no="/[(<"
+for text in *.txt; do
 
-#for text in *.txt; do
+	$(sed -i "1d" $text) #remove the column names from the text and only leave the actual data
 
-#	$(sed -i "1d" $text) #remove the column names from the text and only leave the actual data
-#	$(awk -v "nope=$no" '$2 !~ /'int'/ && $4 !~ /$no/ { print NR, $3, $NF }' $text > awk_out.txt) #extract all lines from the text files that are not the interviewer and that do not contain action descriptors such as (pause)
-#	for i in *.wav; do
-#		if [[ ${i##*.}==${text##*.} ]]; then
-#			python3 parse_wav.py "$i" "awk_out.txt" #segment the lines from above out of the interview wav file
-#			mv *sub*.wav audio #the segments have a descriptor "sub" in their filename, moves these to the audio folder.
-#		fi
-#	done
+        #extract all lines from the text files that are not the interviewer and that do not contain action descriptors such as (pause)
+	$(awk -F"[][(*)<*>/*/]" '$0 !~ /'int'/ { print $3, $NF }' $text > awk_tout.txt)
+        $(awk '$0 ~ /'se'/ { print $1, $3, $NF }' awk_tout.txt > awk_out.txt) 
+	for i in *.wav; do
+		if [[ ${i##*.}==${text##*.} ]]; then
+			python3 parse_wav.py "$i" "awk_out.txt" #segment the lines from above out of the interview wav file
+			mv ./*sub*.wav ./audio #the segments have a descriptor "sub" in their filename, moves these to the audio folder.
+		fi
+	done
 
-#	cp $text data/train #move the text file to both the train and test folders
- #       mv $text data/test
-#done
+	cp $text data/train #move the text file to both the train and test folders
+        mv $text data/test
+done
 
 
 cd audio

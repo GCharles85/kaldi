@@ -44,11 +44,7 @@ mkdir -p $loctmp
 
 printf '%s\n' ${wavs[*]} > $loctmp/allSpeakers.txt
 printf '%s\n' ${trains[*]} > $loctmp/trainSet.txt
-#printf '%s\n' ${wavs[*]} > $loctmp/allspeak.txt
-#printf '%s\n' ${trains[*]} > $loctmp/trainses.txt
 
-#$(tr a-z A-Z < $loctmp/allspeak.txt > $loctmp/allSpeakers.txt)
-#$(tr a-z A-Z < $loctmp/trainses.txt > $loctmp/trainSet.txt)
 printf '%s\n' $(sort $loctmp/allSpeakers.txt | uniq -u) > $loctmp/speakers_all.txt
 printf '%s\n' $(sort $loctmp/trainSet.txt | uniq -u) > $loctmp/speakers_train.txt
 
@@ -91,7 +87,7 @@ while read -r line; do
 	meta=$(find . -type f -name ${spkID%_sub*}".txt") || exit 1 #remove the sub index
        	#from the file name first to match it to a meta text file
 	
-	python3 get_trans.py $meta $ind $uttID 0
+	python3 $locdata/get_trans.py $meta $ind $uttID 0
 	
 	#The call below creates the segments file but this may not be necessary
         #since getdata.sh segments the interviews already.
@@ -110,7 +106,8 @@ while read -r line; do
 done < $loctmp/speakers_train.txt
 
 cp wav.scp $locdata/train_wav.txt || exit 1
-cp text $loctmp/train_trans.txt
+cp text $loctmp/train_trans.txti
+mv $locdata/text .
 
 #move into the test folder
 echo "Moving test files into data/test and filling out meta files in data/test..."
@@ -137,7 +134,7 @@ while read -r line; do
       
 	meta=$(find . -type f -name ${spkID%_sub*}".txt") #remove the sub index from the file name first to match it to a meta text file
 	
-	python3 get_trans.py $meta $ind $uttID 0
+	python3 $locdata/get_trans.py $meta $ind $uttID 0
 #	python3 get_trans.py $meta $ind $uttID 1
 
 	echo $uttID $(pwd)'/'$uttID$ext >> wav.scp
@@ -153,6 +150,7 @@ done < $loctmp/speakers_test.txt
 
 cp wav.scp $locdata/test_wav.txt
 cp text $loctmp/test_trans.txt
+mv $locdata/text .
 cd ..
 cd ..
 
