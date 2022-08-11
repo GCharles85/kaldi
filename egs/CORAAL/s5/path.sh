@@ -5,7 +5,7 @@ export PATH=$PWD/utils/:$KALDI_ROOT/tools/openfst/bin:$PWD:$PATH
 . $KALDI_ROOT/tools/config/common_path.sh
 
 # CORAAL data will be stored in:
-export DATA_ROOT="$KALDI_ROOT/egs/CORAAL/s5/audio/mfcc"    # e.g. something like /media/secondary/voxforge
+export DATA_ROOT="$KALDI_ROOT/egs/CORAAL/s5/audio"    # e.g. something like /media/secondary/voxforge
 
 if [ -z $DATA_ROOT ]; then
   echo "You need to set \"DATA_ROOT\" variable in path.sh to point to the directory to host CORAAL's data"

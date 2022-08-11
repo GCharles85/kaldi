@@ -17,26 +17,26 @@ if [ "$1" == *.txt ]; then
 fi
 
 echo "Retrieving files from the online DB..."
-#wget -i $1 
+wget -i $1 
 
 #untar the tarball textfile
-#echo "Extracting textfiles..."
-#text_tar=$(find . -type f -name "*textfile*.tar.gz") 
-#tar -zxvf $text_tar && rm $text_tar
+echo "Extracting textfiles..."
+text_tar=$(find . -type f -name "*textfile*.tar.gz") 
+tar -zxvf $text_tar && rm $text_tar
 
 #untar the audio files
 
-#tar_gz=$(find . -type f -name "*.tar.gz")
-#for file in $tar_gz; do
+tar_gz=$(find . -type f -name "*.tar.gz")
+for file in $tar_gz; do
 
-#	[ -f "$file" ] || break
-#	tar -zxvf $file 
-#	rm $file
+	[ -f "$file" ] || break
+	tar -zxvf $file 
+	rm $file
 
-#done
+done
  
-#nonnecfiles=$(find . -type f -name "._*") #Grab the appropriate misc. tar file for that interview audio and remove it.
-#rm -r $nonnecfiles
+nonnecfiles=$(find . -type f -name "._*") #Grab the appropriate misc. tar file for that interview audio and remove it.
+rm -r $nonnecfiles
 
 echo "Segmenting audio files..."
 
@@ -45,8 +45,8 @@ for text in *.txt; do
 	$(sed -i "1d" $text) #remove the column names from the text and only leave the actual data
 
         #extract all lines from the text files that are not the interviewer and that do not contain action descriptors such as (pause)
-	$(awk -F"[][(*)<*>/*/]" '$0 !~ /'int'/ { print $3, $NF }' $text > awk_tout.txt)
-        $(awk '$0 ~ /'se'/ { print $1, $3, $NF }' awk_tout.txt > awk_out.txt) 
+	$(awk -F"[*][(*)<*>/*/]" '$0 !~ /'int'/ { print $3, $NF }' $text > awk_tout.txt)
+	$(awk '$4 !~ /['\[']/ && $4 !~ /['\(']/ && $4 !~ /['\<']/ && $4 !~ /['\/']/ { print $1, $3, $NF }' awk_tout.txt > awk_out.txt) || exit
 	for i in *.wav; do
 		if [[ ${i##*.}==${text##*.} ]]; then
 			python3 parse_wav.py "$i" "awk_out.txt" #segment the lines from above out of the interview wav file

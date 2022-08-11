@@ -37,6 +37,7 @@ trains=( "$@" )
 nspk_test=1000
 
 locdata=${KALDI_ROOT}/egs/CORAAL/s5/data/local
+loc=${KALDI_ROOT}/egs/CORAAL/s5/local
 loctmp=$locdata/tmp
 rm -rf $loctmp >/dev/null 2>&1
 mkdir -p $locdata
@@ -72,8 +73,10 @@ while read -r line; do
 		       #utterance ID.
         spkID=${line%.*} #The speaker ID
 	
-	ind_pre=${spk_ID##*b} #the index of the utterance in its respective wav file + 1
-	ind=$((ind_pre-1)) 
+	ind_pre=${spkID##*b} #Index of utterance in respective wav file + 1 
+	
+	ind=$((ind_pre-1))
+        	
 	ext=".""${line##*.}" #the .wav extension
        	
  	uttID=$spkID$ranstr #the utterance ID
@@ -85,9 +88,9 @@ while read -r line; do
 	#utterance in its respective text file.
       
 	meta=$(find . -type f -name ${spkID%_sub*}".txt") || exit 1 #remove the sub index
-       	#from the file name first to match it to a meta text file
+      	#from the file name first to match it to a meta text file
 	
-	python3 $locdata/get_trans.py $meta $ind $uttID 0
+	python3 $loc/get_trans.py $meta $ind $uttID 0
 	
 	#The call below creates the segments file but this may not be necessary
         #since getdata.sh segments the interviews already.
@@ -106,8 +109,7 @@ while read -r line; do
 done < $loctmp/speakers_train.txt
 
 cp wav.scp $locdata/train_wav.txt || exit 1
-cp text $loctmp/train_trans.txti
-mv $locdata/text .
+cp text $locdata/train_trans.txt
 
 #move into the test folder
 echo "Moving test files into data/test and filling out meta files in data/test..."
@@ -125,7 +127,9 @@ while read -r line; do
 	spkID=${line%.*}
 	
 	ind_pre=${spkID##*b}
+
 	ind=$((ind_pre-1))
+	
 	ext=".""${line##*.}"
         
 	uttID=$spkID$ranstr
@@ -134,28 +138,26 @@ while read -r line; do
       
 	meta=$(find . -type f -name ${spkID%_sub*}".txt") #remove the sub index from the file name first to match it to a meta text file
 	
-	python3 $locdata/get_trans.py $meta $ind $uttID 0
-#	python3 get_trans.py $meta $ind $uttID 1
+	python3 $loc/get_trans.py $meta $ind $uttID 0
 
 	echo $uttID $(pwd)'/'$uttID$ext >> wav.scp
 
         cd ..
 	cd ..
         mv audio/$line audio/$uttID$ext || exit 1
-#	mkdir -p data/test/$x_tr &&
+	mkdir -p data/test/$x_tr &&
 	mv audio/$uttID$ext data/test
 	cd data/test
 
 done < $loctmp/speakers_test.txt
 
 cp wav.scp $locdata/test_wav.txt
-cp text $loctmp/test_trans.txt
-mv $locdata/text .
+cp text $locdata/test_trans.txt
+
 cd ..
 cd ..
 
 echo "done up to ARPA prep"
-exit 
 
 # Prepare ARPA LM and vocabulary using SRILM
 local/CORAAL_prepare_lm.sh --order ${lm_order} || exit 1
@@ -164,8 +166,8 @@ local/CORAAL_prepare_lm.sh --order ${lm_order} || exit 1
 # Pronunciations for OOV words are obtained using a pre-trained Sequitur model
 local/CORAAL_prepare_dict.sh || exit 1
 
-# Prepare data/lang and data/local/lang directories
-utils/prepare_lang.sh --position-dependent-phones $pos_dep_phones \ data/local/dict '!SIL' data/local/lang data/lang || exit 1
+#Prepare data/lang and data/local/lang directories
+utils/prepare_lang.sh --position-dependent-phones $pos_dep_phones \data/local/dict "!SIL" data/local/lang data/lang || exit 1
 
 # Prepare G.fst and data/{train,test} directories
 local/CORAAL_format_data.sh || exit 1

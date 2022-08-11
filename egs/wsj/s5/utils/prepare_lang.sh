@@ -61,8 +61,8 @@ unk_fst=        # if you want to model the unknown-word (<oov-dict-entry>)
                 # with a phone-level LM as created by make_unk_lm.sh,
                 # provide the text-form FST via this flag, e.g. <work-dir>/unk_fst.txt
                 # where <work-dir> was the 2nd argument of make_unk_lm.sh.
-phone_symbol_table=              # if set, use a specified phones.txt file.
-extra_word_disambig_syms=        # if set, add disambiguation symbols from this file (one per line)
+phone_symbol_table=${KALDI_ROOT}/egs/CORAAL/s5/exp/mono/phones.txt              # if set, use a specified phones.txt file.
+extra_word_disambig_syms= ${KALDI_ROOT}/egs/CORAAL/s5/data/lang/phones/disambig.txt       # if set, add disambiguation symbols from this file (one per line)
                                  # to phones/disambig.txt, phones/wdisambig.txt and words.txt
 num_extra_phone_disambig_syms=1 # Standard one phone disambiguation symbol is used for optional silence.
                                 # Increasing this number does not harm, but is only useful if you later

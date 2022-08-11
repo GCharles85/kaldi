@@ -1,0 +1,11 @@
+Line#	Speaker	Start	Line		End
+1	Lilia	4.0000	Chemistry.	5.0000
+2	Lilia	15.0000	Well I was going to be a biology major but when I	18.0000
+3	Lilia	19.0000	again when I got to Lemoyne they were still tracking	21.0000
+4	Lilia	22.0000	so based on entrance scores and all this kind of stuff	23.5000
+5	Lilia	24.0000	they had put me in the chemistry curriculum 26.9500
+6	Lilia	27.0000	But I wanted to be if you look at everything when I graduated 30.2500
+7	Lilia	31.0000	I wanted to be a pediatrician so biology is what I should have been majoring in. And my first biology class I figured that was not	41.0000
+8	Lilia	41.2500	going to work. My major professor, chemistry professor looked at my biology grade and said well you have As in lecture and Ds	50.0000
+9	Lilia	50.2500	and Fs in lab. What's going on? I said I just can't kill any animals. He said well if you can't pith a frog	57.0000
+10 	Lilia	57.2500	and everything you better find something else to do. So that's when I just stayed in chemistry instead of switching over to biology	63.0000		 

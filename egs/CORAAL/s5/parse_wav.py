@@ -23,9 +23,9 @@ def main():
     
          reading = f.read(round(numSamples)) #extracts the segment 
 
-         if line[0].isdigit():
-            newWavFile = sys.argv[1][:-4]+'_sub'+line[0]+'.wav'
-            wavfile.write(newWavFile, reading) #writes a new audio file containing the segment
+         
+         newWavFile = sys.argv[1][:-4]+'_sub'+line[0]+'.wav'
+         wavfile.write(newWavFile, reading) #writes a new audio file containing the segment
 
     
 
